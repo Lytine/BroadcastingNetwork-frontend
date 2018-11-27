@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <title>广东广电网络</title>
+    <link rel="stylesheet" href="css/reset.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="./plugins/swiper/swiper.min.css"/>
+    <link href="http://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+<div id="app">
+    <!--header start-->
+    <div class="header-wrapper">
+        <div class="content-wrapper">
+            <div class="header-logo">
+                <img id="logo-img" src="img/logo.png" />
+            </div>
+            <div class="header-menu  fr clearfix">
+                <ul v-show="!searchFlag" class="menu-list">
+                    <li class="active">
+                        <a href="#">首页</a>
+                    </li>
+                    <li>
+                        <a href="#">通知公告</a>
+                    </li>
+                    <li>
+                        <a href="#">帮助中心</a>
+                    </li>
+                    <li>
+                        <a href="#">关于我们</a>
+                    </li>
+                </ul>
+
+                <!--搜索框-->
+                <div class="toggle-search">
+                    <input id="searchInput" v-model="headSearchTxt" v-show="searchFlag"/>
+                    <span @click="handleSearch" class="search-icon"><i class="fa fa-search"></i></span>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <!--header end-->
+    <!--background start-->
+    <div class="content-bg"></div>
+    <!--background end-->
+    <!--content start-->
+    <div class="content-wrapper main-content">
+        <div class="content-wrapper-left">
+            <div class="img-swiper margin-bottom-20">
+                <!-- 轮播图 -->
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide"><img src="img/banner.png" alt=""/></div>
+                        <div class="swiper-slide"><img src="img/banner.png" alt=""/></div>
+                        <div class="swiper-slide"><img src="img/banner.png" alt=""/></div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+            <div class="search-box margin-bottom-20">
+                <div class="search-row search-type">
+                    <div class="search-label">类型:</div>
+                    <div class="search-unlimit choose">不限</div>
+                    <ul class="item-list">
+                        <li>竞价公告</li>
+                        <li>结果公告</li>
+                        <li>更正公告</li>
+                        <li>终止公告</li>
+                    </ul>
+                </div>
+                <div class="search-row search-region">
+                    <div class="search-label">地区:</div>
+                    <div class="search-unlimit">不限</div>
+                    <ul class="item-list">
+                        <li class="choose">广州市</li>
+                        <li>深圳市</li>
+                        <li>珠海市</li>
+                        <li>惠州市</li>
+                        <li class="choose">清远市</li>
+                        <li>江门市</li>
+                        <li>汕尾市</li>
+                        <li>阳江市</li>
+                    </ul>
+                </div>
+                <div class="search-row search-form">
+                    <div class="search-label">搜索:</div>
+                    <!--搜索框-->
+                    <div class="search-bar">
+                        <div class="search-bar-form">
+                            <input v-model="searchParam.searchTxt" class="search-input" type="text">
+                            <button class="search-bar-btn">
+                                <!--<i class="fa fa-search"></i>-->
+                            </button>
+                        </div>
+                        <div class="squaredOne">
+                            <input type="checkbox" value="None" id="squaredOne" checked/>
+                            <label class="check-point" for="squaredOne"></label>
+                        </div>
+                        <label class="checkbox-label" for="squaredOne">显示我只能报的</label>
+                    </div>
+                </div>
+            </div>
+
+            <!--第一行：公司的具体信息-->
+            <div class="content-box">
+                <div v-for="(item, index) in items" :class="index%3==1? 'showCompanyItem-middle':''"
+                     class="showCompanyItem">
+                    <div class="showCompanyItem1">
+                        {{item.title}}
+                    </div>
+                    <div class="showCompanyItem2-3">
+                        <span>采购单位：{{item.buyUnit}}</span>
+                        <br/>
+                        <span>发布时间：{{item.publishTime}}</span>
+                    </div>
+                    <div class="showCompanyItem4">
+                        距离报名结束时间
+                    </div>
+                    <div v-if="left.length!=0" class="showCompanyItem5">
+                        <span v-html="formatNum(getDays(left[index].left))"></span>
+                        <span>天<a href="#"></a></span>
+                        <span v-html="formatNum(getHours(left[index].left))"></span>
+                        <span>时</span>
+                        <span v-html="formatNum(getMinutes(left[index].left))"></span>
+                        <span>分</span>
+                        <span v-html="formatNum(getSeconds(left[index].left))"></span>
+                        <span>秒</span>
+                    </div>
+                    <div class="showCompanyItem6">
+                        <!--<button :class="item.buttonType=='即将开始'? 'btn btn-green':'btn btn-orange' ">-->
+                        <button class="btn" :class="showDiffBtn(item.status)">
+                            {{item.buttonType}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!--底部分页条-->
+            <div class="page-bar margin-bottom-70">
+                <div class="bottom-page-bar">
+                    <ul class="pagination">
+                        <li class="pagination-start"><a href="#"><i style="font-size: 16px" class="fa fa-angle-left"></i></a></li>
+                        <li><a href="#">1</a></li>
+                        <li><a class="active" href="#">2</a></li>
+                        <li><a href="#">3</a></li>
+                        <li><a href="#">4</a></li>
+                        <li><a href="#">5</a></li>
+                        <li><a href="#">6</a></li>
+                        <li><a href="#">7</a></li>
+                        <li><a href="#">8</a></li>
+                        <li><a href="#">9</a></li>
+                        <li><a href="#"><i style="font-size: 16px" class="fa fa-angle-right"></i></a></li>
+                    </ul>
+                    <span class="pagination-info">
+                        <span>共10页</span>
+                        <span>跳至
+                            <span><input value="5"/></span>
+                        </span>
+                        <span>页</span>
+                    </span>
+                </div>
+            </div>
+            <!--底部分页条-->
+        </div>
+
+        <div class="content-wrapper-right">
+            <div class="dashboard">
+                <div class="row">
+                    <div><div><img src="./img/发布公告icon.png" /></div><span>发布公告</span></div>
+                    <div><div><img src="./img/发布公告icon.png" /></div><span>发布公告</span></div>
+                </div>
+                <div class="row">
+                    <div><div><img src="./img/发布公告icon.png" /></div><span>发布公告</span></div>
+                    <div><div><img src="./img/发布公告icon.png" /></div><span>发布公告</span></div>
+                </div>
+                <div class="border-bottom-dashed"></div>
+                <div class="dashboard-num">
+                    <div>
+                        <div>
+                            <span class="num">4.7</span>万
+                        </div>
+                        <span>供应商</span>
+                    </div>
+                    <div style="margin: 0 48px">
+                        <div>
+                            <span class="num">1.2</span>万
+                        </div>
+                        <span>采购人</span>
+                    </div>
+                    <div>
+                        <div>
+                            <span class="num">4480</span>
+                        </div>
+                        <span>专家</span>
+                    </div>
+                </div>
+            </div>
+            <div class="relative-website">
+                <div class="title-wrapper">
+                    <div>
+                        <span>相关网站</span>
+                    </div>
+                </div>
+                <ul>
+                    <li v-for="(item, index) in relativeWebsites"
+                        :style="{'background-color': index%2==0 ? '':'#f9f9f9'}">
+                        <a :href="item.url">{{item.title}}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!--content end-->
+    <!--footer start-->
+    <div class="friend-link">
+        <div class="content-wrapper">
+            <div class="friend-link-list">
+                <h3 class="footer-title">通知公告</h3>
+                <ul>
+                    <li><a href="#">竞价公告</a></li>
+                    <li><a href="#">结果公告</a></li>
+                    <li><a href="#">更正公告</a></li>
+                    <li><a href="#">废标公告</a></li>
+                </ul>
+            </div>
+
+            <div class="friend-link-list">
+                <h3 class="footer-title">帮助中心</h3>
+                <ul>
+                    <li><a href="#">常见问题</a></li>
+                    <li><a href="#">采购人使用指南</a></li>
+                    <li><a href="#">供应商使用指南</a></li>
+                    <li><a href="#">专家使用指南</a></li>
+                </ul>
+            </div>
+
+            <div class="friend-link-list">
+                <h3 class="footer-title">友情链接</h3>
+                <ul>
+                    <li><a href="#">广电智采采购网</a></li>
+                    <li><a href="#">网上询价系统</a></li>
+                    <li><a href="#">智采电子交易平台</a></li>
+                    <li><a href="#">广东广播电子交易平台</a></li>
+                </ul>
+            </div>
+
+            <div class="friend-link-list" style="margin-right: 30px">
+                <h3 class="footer-title">联系方式</h3>
+                <ul>
+                    <li>地址：广州市越秀区环市东路472号粤海大厦7、23楼</li>
+                    <li>邮政编码：510075</li>
+                    <li>电话：(020) 8765 1688 转694</li>
+                    <li>传真：(020) 8765 9323 (020) 8765 1698</li>
+                </ul>
+            </div>
+
+            <div class="qrCode">
+                <img src="./img/qrCode.jpg" alt="官方微信二维码" /><br/>
+                <span>官方微信</span>
+            </div>
+        </div>
+    </div>
+    <div class="copyright">
+        Copyright &copy; 2013-2018 广东采联采购科技有限公司. All rights reserved. 粤IPC备15024293号
+        <a href="#">点击打开信息产业部备案管理系统</a><br>
+        Copyright &copy; 2013-2018 Guangdong Choicelink Internet Technology Co.,Ltd;
+        <br>
+        所有内容未经授权,不得转载或做其他使用,违者必究。
+    </div>
+    <!--footer end-->
+</div>
+
+
+<script src="./js/jquery.min.js"></script>
+<script src="./js/lodash.min.js"></script>
+<script src="./plugins/swiper/swiper.min.js"></script>
+<script type="text/javascript" src="js/vue.js"></script>
+<script src="./js/axios.min.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+
+</body>
+
+</html>
