@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="css/style.css"/>
     <link rel="stylesheet" href="./plugins/swiper/swiper.min.css"/>
     <link href="http://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-
 </head>
 
 <body>
@@ -38,7 +37,9 @@
                 <!--搜索框-->
                 <div class="toggle-search">
                     <input id="searchInput" v-model="headSearchTxt" v-show="searchFlag"/>
-                    <span @click="handleSearch" class="search-icon"><i class="fa fa-search"></i></span>
+                    <span @click="handleSearch" class="search-icon">
+                        <!--<i class="fa fa-search"></i>-->
+                    <img src="img/header_search.png" height="20" width="20"/></span>
                 </div>
 
 
@@ -63,29 +64,20 @@
                     <div class="swiper-pagination"></div>
                 </div>
             </div>
+            <!--搜索盒子start-->
             <div class="search-box margin-bottom-20">
                 <div class="search-row search-type">
                     <div class="search-label">类型:</div>
                     <div class="search-unlimit choose">不限</div>
                     <ul class="item-list">
-                        <li>竞价公告</li>
-                        <li>结果公告</li>
-                        <li>更正公告</li>
-                        <li>终止公告</li>
+                       <li v-cloak  v-for ="item in searchTypes">{{item.type}}</li>
                     </ul>
                 </div>
                 <div class="search-row search-region">
                     <div class="search-label">地区:</div>
-                    <div class="search-unlimit">不限</div>
+                    <div class="search-unlimit choose">不限</div>
                     <ul class="item-list">
-                        <li class="choose">广州市</li>
-                        <li>深圳市</li>
-                        <li>珠海市</li>
-                        <li>惠州市</li>
-                        <li class="choose">清远市</li>
-                        <li>江门市</li>
-                        <li>汕尾市</li>
-                        <li>阳江市</li>
+                        <li v-cloak v-for="item in searchRegions">{{item.city}}</li>
                     </ul>
                 </div>
                 <div class="search-row search-form">
@@ -93,7 +85,7 @@
                     <!--搜索框-->
                     <div class="search-bar">
                         <div class="search-bar-form">
-                            <input v-model="searchParam.searchTxt" class="search-input" type="text">
+                            <input v-model="bidsSearchParam.keyword" class="search-input" type="text">
                             <button class="search-bar-btn">
                                 <!--<i class="fa fa-search"></i>-->
                             </button>
@@ -106,18 +98,20 @@
                     </div>
                 </div>
             </div>
+            <!--搜索盒子end-->
+
 
             <!--第一行：公司的具体信息-->
-            <div class="content-box">
-                <div v-for="(item, index) in items" :class="index%3==1? 'showCompanyItem-middle':''"
+            <div class="content-box" v-cloak>
+                <div v-for="(item, index) in bids.data" :class="index%3==1? 'showCompanyItem-middle':''"
                      class="showCompanyItem">
                     <div class="showCompanyItem1">
                         {{item.title}}
                     </div>
                     <div class="showCompanyItem2-3">
-                        <span>采购单位：{{item.buyUnit}}</span>
+                        <span><img src="img/company.png" height="12" width="12" style="margin-right:5px;"/>采购单位：{{item.buyUnit}}</span>
                         <br/>
-                        <span>发布时间：{{item.publishTime}}</span>
+                        <span><img src="img/time.png" height="12" width="12"style="margin-right:5px;"/></li>发布时间：{{item.publishTime}}</span>
                     </div>
                     <div class="showCompanyItem4">
                         距离报名结束时间
@@ -129,6 +123,7 @@
                         <span>时</span>
                         <span v-html="formatNum(getMinutes(left[index].left))"></span>
                         <span>分</span>
+                        <!--<span v-html="formatNum(getSeconds(left[index].left))"></span>-->
                         <span v-html="formatNum(getSeconds(left[index].left))"></span>
                         <span>秒</span>
                     </div>
@@ -143,19 +138,19 @@
 
             <!--底部分页条-->
             <div class="page-bar margin-bottom-70">
-                <div class="bottom-page-bar">
+                <div class="bottom-page-bar" v-cloak>
                     <ul class="pagination">
-                        <li class="pagination-start"><a href="#"><i style="font-size: 16px" class="fa fa-angle-left"></i></a></li>
-                        <li><a href="#">1</a></li>
-                        <li><a class="active" href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li><a href="#">4</a></li>
-                        <li><a href="#">5</a></li>
-                        <li><a href="#">6</a></li>
-                        <li><a href="#">7</a></li>
-                        <li><a href="#">8</a></li>
-                        <li><a href="#">9</a></li>
-                        <li><a href="#"><i style="font-size: 16px" class="fa fa-angle-right"></i></a></li>
+                        <li class="pagination-start">
+                            <a href="javascript:" @click="goPage(bids.currentPage > 1 ? bids.currentPage-1:1)">
+                                <i style="font-size: 16px" class="fa fa-angle-left"></i>
+                            </a>
+                        </li>
+                        <li v-for="i in (bidsPageBar.endIndex  - bidsPageBar.startIndex + 1)">
+                            <a href="javascript:" :class="(bidsPageBar.startIndex + i - 1) === bids.currentPage ? 'activePage':''">
+                                {{bidsPageBar.startIndex + i - 1}}
+                            </a>
+                        </li>
+                        <li><a href="javascript:" @click="goPage(bids.currentPage < bids.totalPage ? bids.currentPage + 1:bids.totalPage)"><i style="font-size: 16px" class="fa fa-angle-right"></i></a></li>
                     </ul>
                     <span class="pagination-info">
                         <span>共10页</span>
@@ -208,8 +203,7 @@
                     </div>
                 </div>
                 <ul>
-                    <li v-for="(item, index) in relativeWebsites"
-                        :style="{'background-color': index%2==0 ? '':'#f9f9f9'}">
+                    <li  v-cloak v-for="(item, index) in relativeWebsites" :style="{'background-color': index%2==0 ? '':'#f9f9f9'}">
                         <a :href="item.url">{{item.title}}</a>
                     </li>
                 </ul>
@@ -285,6 +279,8 @@
 <script src="./plugins/swiper/swiper.min.js"></script>
 <script type="text/javascript" src="js/vue.js"></script>
 <script src="./js/axios.min.js"></script>
+<script src="./js/common.js"></script>
+<script type="text/javascript" src="js/req.js"></script>
 <script type="text/javascript" src="js/index.js"></script>
 
 </body>

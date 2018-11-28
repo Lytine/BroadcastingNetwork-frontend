@@ -415,7 +415,7 @@ button {
 
 .showCompanyItem2-3 > span {
     font-size: 12px;
-    line-height: 17px;
+    line-height: 20px;
 }
 
 /*4. 提示距离结束的时间---更正公告*/
@@ -431,7 +431,7 @@ button {
 .showCompanyItem5 {
     display: inline-block;
     position: relative;
-    width: 245px;
+    /*width: 250px;*/
     text-align: center;
     margin: 15px auto auto 20px;
 }
@@ -543,14 +543,15 @@ ul.pagination li a {
     font-size: 12px;
 }
 
-ul.pagination li a.active {
+ul.pagination li a.activePage {
     background-color: #FF9900;
     border: 1px solid #FF9900;
     color: white;
 }
 
 ul.pagination li a:hover:not(.active) {
-    background-color: #ddd;
+    color: #fff;
+    background-color: #ff9900;
 }
 
 .bottom-page-bar .pagination-info span {

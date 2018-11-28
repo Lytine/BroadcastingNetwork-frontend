@@ -29,47 +29,91 @@ function initSwiper() {
         }
     });
 }
+//加载服务器的时间
+function loadServerTime() {
+    let _this = this;
+    getReq('./data/serverTime.json').then((res)=>{
+        _this.serverTime = res.data;
+    })
+}
 
+//加载相关网站
 function loadRelativeWebsite() {
     let _this = this;
-    axios.get('./data.json')
-        .then((res)=>{
-            let data = res.data.relativeWebsites;
-            if(data.code === 0) {
+    /*axios.get('./data/relativeWebsites.json')
+        .then(function(res){
+            let data = res.data;
+           if(data.code === 0) {
                 _this.relativeWebsites = data.data;
-            } else {
-                alert(data.message);
-            }
+           } else {
+
+           }
         })
-        .catch((error) => {
+        .catch(function (error){
             console.log(error);
             alert("请求出错");
+        });*/
+    getReq('./data/relativeWebsites.json').then((res)=>{
+        _this.relativeWebsites = res.data;
+    });
+}
+
+function loadBids() {
+    let _this = this;
+    getReq('./data/bids.json', _this.bidsSearchParam).then((res)=>{
+        _this.bids = res.data;
+        let bar = getPageIndex(_this.bids.pageSize, _this.bids.currentPage, _this.bids.totalPage);
+        _this.bidsPageBar.startIndex = bar.startPageIndex;
+        _this.bidsPageBar.endIndex = bar.endPageIndex;
+    });
+}
+
+//选择搜索类型
+function loadSearchType(){
+    let _this = this;
+    getReq('./data/searchTypes.json')
+        .then(function(res){
+            _this.searchTypes = res.data;
         });
 }
 
+function loadSearchRegions(){
+    let _this = this;
+    getReq('./data/searchRegions.json').then((res)=>{
+        _this.searchRegions = res.data;
+    })
+}
+
+
+
 //倒计时
-function created() {
+function countingdown(){
     let _this = this;
     // 更新本地存储的服务器时间，不再向服务器发送获取时间请求
     setInterval(() => {
         _this.serverTime += 1000;
     }, 1000);
+}
 
+//搜过框
+function initSearchBox() {
+    let _this = this;
     $(document).bind("click", function (e) {// 鼠标点击空白处，隐藏搜索input　　　
         let target = $(e.target);
         if (target.closest(".toggle-search").length === 0) {
             _this.searchFlag = false;
         }
     });
-
-    this.loadRelativeWebsite();
-
 }
 
-
-//搜过框
-function initSearchBox() {
-
+function created() {
+    this.countingdown();
+    this.initSearchBox();
+    this.loadServerTime();
+    this.loadBids();
+    this.loadRelativeWebsite();
+    this.loadSearchType();
+    this.loadSearchRegions();
 }
 
 function mounted() {
@@ -81,111 +125,56 @@ const app = new Vue({
     data: {
         searchFlag: false,
         headSearchTxt: '',
-        searchParam: {
-            searchTxt: ''
-        },
-        serverTime: 1542942519745, // 异步请求获取服务器时间
+        serverTime: new Date().getTime(), // 异步请求获取服务器时间
         relativeWebsites: [],
-        items: [{
-            id: '1',
-            title: '广东省广播电视网络股份有限公司清远分公司全市光纤、同轴电缆',
-            buyUnit: '广东省广播电视网络股份有限公司',
-            publishTime: '2018-11-06 18：15：17',
-            endTime: 1542942529745,
-            buttonType: '即将开始',
-            status: 0
+        searchTypes:[],
+        searchRegions:[],
+
+        bidsSearchParam: {
+            keyword: '',
+            region: '',
+            type: '',
+            page: 1
         },
-            {
-                id: '2',
-                title: '广东省广播电视网络股份有限公司清远分公司全市光纤、同轴电缆',
-                buyUnit: '广东省广播电视网络股份有限公司',
-                publishTime: '2018-11-06 18：15：17',
-                endTime: 1542977959654,
-                buttonType: '已结束',
-                status: 2
-            },
-            {
-                id: '3',
-                title: '广东省广播电视网络股份有限公司清远分公司全市光纤、同轴电缆',
-                buyUnit: '广东省广播电视网络股份有限公司',
-                publishTime: '2018-11-06 18：15：17',
-                endTime: 1542946969654,
-                buttonType: '正在进行',
-                status: 1
-            },
-            {
-                id: '4',
-                title: '广东省广播电视网络股份有限公司清远分公司全市光纤、同轴电缆',
-                buyUnit: '广东省广播电视网络股份有限公司',
-                publishTime: '2018-11-06 18：15：17',
-                endTime: 1542947959654,
-                buttonType: '点击查看',
-                status: 3
-            },
-            {
-                id: '5',
-                title: '广东省广播电视网络股份有限公司清远分公司全市光纤、同轴电缆',
-                buyUnit: '广东省广播电视网络股份有限公司',
-                publishTime: '2018-11-06 18：15：17',
-                endTime: 1542947959654,
-                buttonType: '即将开始',
-                status: 0
-
-            },
-            {
-                id: '6',
-                title: '广东省广播电视网络股份有限公司清远分公司全市光纤、同轴电缆',
-                buyUnit: '广东省广播电视网络股份有限公司',
-                publishTime: '2018-11-06 18：15：17',
-                endTime: 1542947959654,
-                buttonType: '即将开始',
-                status: 0
-
-            },
-            {
-                id: '7',
-                title: '广东省广播电视网络股份有限公司清远分公司全市光纤、同轴电缆',
-                buyUnit: '广东省广播电视网络股份有限公司',
-                publishTime: '2018-11-06 18：15：17',
-                endTime: 1542947959654,
-                buttonType: '点击查看',
-                status: 3
-            },
-            {
-                id: '8',
-                title: '广东省广播电视网络股份有限公司清远分公司全市光纤、同轴电缆',
-                buyUnit: '广东省广播电视网络股份有限公司',
-                publishTime: '2018-11-06 18：15：17',
-                endTime: 1542947959654,
-                buttonType: '即将开始',
-                status: 0
-            },
-            {
-                id: '9',
-                title: '广东省广播电视网络股份有限公司清远分公司全市光纤、同轴电缆',
-                buyUnit: '广东省广播电视网络股份有限公司',
-                publishTime: '2018-11-06 18：15：17',
-                endTime: 1542949959654,
-                buttonType: '正在进行',
-                status: 3
-            }],
+        bids: {
+            currentPage: 1,
+            totalPage: 1,
+            totalNum: 0,
+            pageSize: 9,
+            data: []
+        },
+        bidsPageBar: {
+            pageBarSize: 10,
+            startIndex: 1,
+            endIndex: 10
+        },
         left: [],
 
     },
     watch: {
         serverTime: function () {
             let lf = [];
-            for (let i = 0; i < this.items.length; i++) {
+            for (let i = 0; i < this.bids.data.length; i++) {
                 let item = {};
-                item.id = this.items[i].id;
-                item.left = this.items[i].endTime - this.serverTime;
+                item.id = this.bids.data[i].id;
+                item.left = this.bids.data[i].endTime - this.serverTime;
                 lf[i] = item;
             }
             this.left = lf;
         }
     },
     methods: {
-        loadRelativeWebsite,
+        initSearchBox:initSearchBox,
+        countingdown:countingdown,
+        loadServerTime: loadServerTime,
+        loadRelativeWebsite:loadRelativeWebsite,
+        loadSearchType:loadSearchType,
+        loadSearchRegions:loadSearchRegions,
+        loadBids: loadBids,
+        goPage: function(page) {
+            this.bidsSearchParam.page = page;
+            this.loadBids();
+        },
         getDays: function (millis) { // 1min = 60000ms, 1h = 3600000ms
             return parseInt(millis / 86400000);
         },
@@ -208,14 +197,19 @@ const app = new Vue({
             }
             let tmpStr = preStr + str;
             let html = '';
+            let htmlfinal = '<span class="time margin-left-3px">0</span><span class="time margin-left-3px">0</span>';
             for (let i = 0; i < tmpStr.length; i++) {
                 let clazz = 'time';
                 if(i > 0) {
                     clazz += ' margin-left-3px';
                 }
-                html += '<span class="'+ clazz +'">' + tmpStr[i] + '</span>'
+                html += '<span class="'+ clazz +'">' + tmpStr[i] + '</span>';
+
             }
-            return html;
+          if(time < 0 )
+              return htmlfinal;
+          else
+              return html
         },
         showDiffBtn: function (status) {
             switch (status) {
@@ -245,7 +239,6 @@ const app = new Vue({
 
         }
     },
-
     //create的时期：dom还没被vue的dom替换
     //mounted的时期：dom还没被vue的dom替换
     created: created,
